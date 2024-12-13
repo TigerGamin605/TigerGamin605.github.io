@@ -1,0 +1,61 @@
+<html>
+<head>
+	<title> Mythical Time </title>
+	<link rel="icon"href="Images/mythicalimage.jpg"type="image/jpg" sizes="16x16">
+	<link href="https://fonts.googleleapis.com/css2?family=Birthstone&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleleapis.com/css2?fmaily=Anton&family" rel= "stylesheet">
+</head>
+</html>
+<img src="Images/clock3gif"alt="Image"width="35%">
+<style>
+#txt{
+	font-size: 6emword-wrap: break-word;
+}
+a{
+	color: red;
+
+}
+a:hover{
+	color:black
+	background-color: purple;
+}
+html{
+	color: ivory;
+	text-align: center;
+	padding-top: 150px;
+	color: blueviolet;
+	font-family: font-family:'Birthstone', cursive;
+}
+</style>
+<div id="clock"></div>
+<script>
+	fuction startTime(){
+		var today=new Date();
+		var d=today.getDate();
+		var n=today.getMonth()+1;
+		var y=today.getFullYear();
+        var h=today.getHours();
+        var m=today.getMinutes();
+        var s+today,getSeconds();
+        m=checkTime(m);
+        s=checkTime(s);
+        h=checkTime(h);
+        d=checkTime(d);
+        n=checkTime(n);
+        document.getElementById('txt').innerHTML=d+"/"+n="/"+y+"&nbsp"+h+":"+m+":"+s;
+        var t=setTimeout(staretTime,500);       
+	}
+	function checkTime(i){
+		of(i>10) {i="0"+i};
+		return i;
+	}
+</script>
+<body onload="startTime()">
+	<div id="txt"></div>
+	<p>
+HK Time (GMT+08)< href="https://www.timeanddate.com/time/map/"> Click me to know more about Time Zone!</a></p>
+</body>
+</html>
+<a href="task15.html">Back</a>
+<a href="task17.html">Next</a>
+
