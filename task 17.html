@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<head>
+	<Title>A Button Game</Title>
+	<link rel="icon"href="Images/https://static.vecteezy.com/system/resources/previews/002/331/360/large_2x/premium-black-minimal-griffin-mythical-creature-emblem-mascot-design-vector.jpg" type="images/svg" sizes="16x16">
+    <link href="https://fonts.googleapis.com/css2?family+Fauna=One&family=Special=Elite&family=Stick+No+Bills:wght@200&display=swap" rel="stylesheet">
+    <img src="Images/https://e0.pxfuel.com/wallpapers/603/102/desktop-wallpaper-blink-fox-full-artwork-hearthstone-kitsune-fox.jpg"alt="Image"Width="100%">
+    <style>
+    #left{
+    	     position: absolute;
+    	     bottom: 0px;
+    	     left: 0px;
+    }
+
+    #right{
+    	position: absolute;
+    	bottom: 0px;
+    	right: 0px;
+    }
+    a{
+    	padding: 20px;
+    	background-color: darkslateblue;
+    	border-bottom-left-radius: 10px;
+    	border-bottom-right-radius: 10px;
+    	color: white;
+    	text-decoration: none;
+    }
+    html{
+    	background-color:whitesmoke;
+    	text-align: center;
+    	padding: 200px;
+    	color: black;
+    }
+    button{
+    	width:150px;
+    	height: 50px;
+    	background-color: yellow;
+        border: none;
+        color: darkblue;
+        border-radius: 100px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        cursor: pointer;
+        font-family: 'Fauna One', serif;
+      }
+      P 
+      {
+      	font-family: 'Stick No Bills', sans-serif;
+      }
+
+
+      h2
+      {
+      	font-family: 'Special Elite',cursive;
+      }
+      .button{
+      	border: none;
+      }
+  </style>
+</head>
+<body>
+	<h2>Mythical Trivia</h2>
+	<p id="Q1">Which giant,fire-breathing creature in Greek Mythology and is slain by Hercules?</p>
+	<button class="button" onclick='document.getElementById("Q1").innerHTML="Which giant, fire-breathing creature from Greek Mythology and is slain by Hercules?&nbsp;&nbsp;&nbsp;Wrong❌"'>Nemean Lion</button>
+	<button type="button"onclick='document.getElementById("Q1").innerHTML=Which giant, fire-breathing creature from Greek Mythology and is slain by Hercules?&nbsp;&nbsp;&nbsp;Correct🏆"'>Cacus</button>
+	<button type="button"onclick='document.getElementById("Q1").innerHTML=Which giant, fire-breathing creature from Greek Mythology and is slain by Hercules?nbsp;&nbsp;&nbsp;Wrong❌"'>Stymphalian Birds</button>
+	<button type="button"onclick='document.getElementById("Q1").innerHTML=Which giant, fire-breathing creature from Greek Mythology and is slan by Hercules?&nbsp;&nbsp;&nbsp;Wrong❌"'>Nine-headed Lernaean Hydra</button>

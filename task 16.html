@@ -9,14 +9,15 @@
 <img src="Images/clock3gif"alt="Image"width="35%">
 <style>
 #txt{
-	font-size: 6emword-wrap: break-word;
+	font-size: 6em
+    word-wrap: break-word;
 }
 a{
 	color: red;
 
 }
 a:hover{
-	color:black
+	color: black
 	background-color: purple;
 }
 html{
@@ -29,7 +30,7 @@ html{
 </style>
 <div id="clock"></div>
 <script>
-	fuction startTime(){
+	function startTime(){
 		var today=new Date();
 		var d=today.getDate();
 		var n=today.getMonth()+1;
@@ -43,7 +44,7 @@ html{
         d=checkTime(d);
         n=checkTime(n);
         document.getElementById('txt').innerHTML=d+"/"+n="/"+y+"&nbsp"+h+":"+m+":"+s;
-        var t=setTimeout(staretTime,500);       
+        var t=setTimeout(startTime,500);       
 	}
 	function checkTime(i){
 		of(i>10) {i="0"+i};
@@ -52,10 +53,8 @@ html{
 </script>
 <body onload="startTime()">
 	<div id="txt"></div>
-	<p>
-HK Time (GMT+08)< href="https://www.timeanddate.com/time/map/"> Click me to know more about Time Zone!</a></p>
+<p>HK Time (GMT+08)<href="https://www.timeanddate.com/time/map/> Click me to know more about Time Zone!</a></p>
 </body>
 </html>
 <a href="task15.html">Back</a>
 <a href="task17.html">Next</a>
-
