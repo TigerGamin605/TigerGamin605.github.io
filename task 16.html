@@ -4,12 +4,12 @@
 	<link rel="icon"href="Images/mythicalimage.jpg"type="image/jpg" sizes="16x16">
 	<link href="https://fonts.googleleapis.com/css2?family=Birthstone&display=swap" rel="stylesheet">
 	<link href="https://fonts.googleleapis.com/css2?fmaily=Anton&family" rel= "stylesheet">
-</head>
-</html>
-<img src="Images/clock3gif"alt="Image"width="35%">
+
+
+<img src="https://cdn.mos.cms.futurecdn.net/VgGxJABA8DcfAMpPPwdv6a.jpg"alt="Image"width="35%">
 <style>
 #txt{
-	font-size: 6em
+	font-size: 6em;
     word-wrap: break-word;
 }
 a{
@@ -17,7 +17,7 @@ a{
 
 }
 a:hover{
-	color: black
+	color: black;
 	background-color: purple;
 }
 html{
@@ -28,6 +28,8 @@ html{
 	font-family: font-family:'Birthstone', cursive;
 }
 </style>
+</head>
+<body>
 <div id="clock"></div>
 <script>
 	function startTime(){
@@ -37,7 +39,7 @@ html{
 		var y=today.getFullYear();
         var h=today.getHours();
         var m=today.getMinutes();
-        var s+today,getSeconds();
+        var s=today.getSeconds();
         m=checkTime(m);
         s=checkTime(s);
         h=checkTime(h);
@@ -47,14 +49,14 @@ html{
         var t=setTimeout(startTime,500);       
 	}
 	function checkTime(i){
-		of(i>10) {i="0"+i};
+		if(i>10) {i="0"+i};
 		return i;
 	}
 </script>
 <body onload="startTime()">
 	<div id="txt"></div>
-<p>HK Time (GMT+08)<href="https://www.timeanddate.com/time/map/> Click me to know more about Time Zone!</a></p>
+<p>HK Time (GMT+08)<a href="https://www.timeanddate.com/time/map/">Click me to know more about Time Zones!</a></p>
 </body>
 </html>
-<a href="task15.html">Back</a>
-<a href="task17.html">Next</a>
+<a href="task 15.html">Back</a>
+<a href="task 17.html">Next</a>
