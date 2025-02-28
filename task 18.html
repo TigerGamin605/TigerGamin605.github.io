@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Random Numbers</title>
+<link rel="icon" href="Images/numbers.jpg" size="25x25">
+<link href="https://fonts.googleapis.com/css2?&family=Inria+Serif:ital,wght@1,300&family=Vast+Shadow&display=swap"rel="stylesheet">
+<img src="https://th.bing.com/th/id/R.0d608ef2b5c422b4097d4ae24d94db87?rik=UqJRhYkj0MK3aw&riu=http%3a%2f%2fclipart-library.com%2fimages%2f8czraaqMi.jpg&ehk=IDxxw5zqBgoYsq7%2fBI3THyCFrdvm%2basZXeYFr7u2lF0%3d&risl=&pid=ImgRaw&r=0">
+</head>
+<body>
+	<style>
+	#left{
+                position: absolute;
+                bottom: 0px;
+                left: 0px;
+        }
+
+    #right{
+                position: absolute;
+                bottom: 0px;
+                right: 0px;
+        } 
+        a{
+                padding: 20px;
+                background-color: #e9b0fc;
+                border-bottom-left-radius: 10px;
+                border-bottom-right-radius: 10px ;
+                color: #25ced1;
+                text-decoration: underline;
+                font-family: 'Inria Serif', serif;
+        }
+	html{
+		background-color: crimson;
+		text-align: center;
+		padding: 20px;
+		color: white;
+		font-family: 'Courier New', Fantasy;
+		font-size: 50px;
+	}
+	button{
+		background-color: #f2cd48;
+		font-family: 'Courier New', Monospace;
+		text-decoration: none;
+		display: inline-block;
+		border: none;
+		border-radius: 10px;
+		padding: 25px;
+		color: #ea5ba7;
+		font-size: 25px;
+		outline: none;
+	}
+	button:hover{
+		background-color: #c4cdfc;
+		color: #ffe28e;
+	}
+</style>
+<p>Random Numbers (1-1250):</p>
+<button onclick="myFunction()">Click Here To Get A Random Number!</button>
+<p id="demo"></p>
+<script>
+	function myFunction(){
+		document.getElementById("demo").innerHTML=Math.floor(Math.random()*1250)
+	}
+</script>
+<a href="task17.html">Back</a>
+<a href="task19.html">Next</a>
+</body>
+</html>

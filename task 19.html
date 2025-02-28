@@ -1,0 +1,99 @@
+<!DOCTYPE>
+<html>
+<head>
+<title>Random Mythical Creatures</title>
+<link rel="icon" href="https://th.bing.com/th/id/R.e6ac0b06f8ce6980aa83708f8b1b3dfa?rik=zZktoldUbx0KDg&riu=http%3a%2f%2fq-workshop.com%2fimg%2fp%2f6%2f1%2f7%2f6%2f6176-large_default.jpg&ehk=H%2biyA3Xjsd4thrqmd3Vxu9WQHQ7vgW5JGLLl6mbtDR8%3d&risl=&pid=ImgRaw&r=0"size="32x32">
+<link href="https://fonts.googleleapis.com/css2?family=Birthstone&display=swap"rel="stylesheet">
+
+</head>
+<style>
+   
+		#left{
+			         position: absolute;
+			         bottom: 0px;
+			         left: 0px;
+
+             }
+
+             #right{
+             	position: absolute;
+             	bottom: 0px;
+             	right: 0px;
+
+             }
+             a{
+             	padding: 20px;
+             	background-color: #00FFFF;
+             	border-bottom-left-radius: 10px;
+             	border-bottom-right-radius: 10px;
+             	color: #25ced1;
+             	text-decoration: underline;
+             	font-family: 'Inria Serif', serif;
+
+             }
+             html{
+             	background-color: #00FFFF;
+             	text-align: center;
+             	padding: 20px;
+             	color: whitesmokefont-family: 'Vast Shadow', cursive;
+             	font-size: 50px;
+             }
+             button{
+             	background-color: #f2cd48;
+             	font-family: 'Inria Serif', serif;
+                text-decoration: none;
+                display:inline-block;
+                border: none;
+                border-radius: 10px;
+                padding: 25px;
+                color: #ea5ba7;
+                font-size:  25px;
+                outline: none;
+             }
+             button:hover{
+             	background-color: #c4cdfc;
+             	color: #ffe28e;
+             }
+            #randomCreature{
+               font-family: 'Scherherezade New', serif;
+               text-decoration: underline;
+               background-color: #00FFFF;
+               padding-right: 10px;
+               padding-left: 10px;
+               padding-top: 10px;
+               padding-bottom: 10px;
+               display: inline-block;
+               border: none;
+               border-radius: 10px;
+               color: #5fd3d3;
+               font-size: 25px;
+               outline: none;
+            }
+         </style>
+         <body>
+            <img src="https://th.bing.com/th/id/R.5d38bbc4c44877bfacd8676c5653303b?rik=Urw7ZjuCSs7wfA&pid=ImgRaw&r=0&sres=1&sresct=1"alt="Image"Width="50%">   
+        <br><br>
+      
+         <button onclick="findCreatures();" type="randomCreature">Click to generate a random Mythical Creature!</button>
+         <br>
+         <p name="randomCreature" id="randomCreature"></p>
+         <br><br> 
+     </div>
+     <script>
+     	const creatures=["Phoenix", "Kitsune", "Leviathan", "Minotaur", "Hydra", "Chimera", "Cerberus", "Cyclops", "Dragon", "Fenrir"]
+        let randomIndex=Math.floor(Math.random()*creatures.length);
+        document.getElementById("randomCreature").innerHTML =("value", creatures[randomIndex]);
+         function findCreatures(){
+         let randomIndex=Math.floor(Math.random()*creatures.length);
+         document.getElementById("randomCreature").innerHTML =("value",creatures[randomIndex]);
+        }
+      </script>
+      <a href="task 18.html">Back</a>
+      <a href="task 20.html">Next</a>
+   </body>
+   </html>
+
+
+         
+
+			    
