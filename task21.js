@@ -19,7 +19,7 @@ function startStop(){
 
 		//Start the stopwatch (by calling setInterval() function)
 		interval = window.setInterval(stopwatch, 0);
-		document.getElementById("startStop").innerHMTL ="Stop Generating";
+		document.getElementById("startStop").innerHTML ="Stop Generating";
 		status = "started";
 	}
 	else{
