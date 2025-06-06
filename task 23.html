@@ -1,0 +1,70 @@
+<!DOCTYPE  html>
+<html>
+<head>
+	<link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&family=Indie+Flower&display=swap" rel="sylesheet" rel="stylesheet"> rel="stylesheet">
+	<title> Today is...</title>
+	<img src="Images/calendar.gif"alt="Image"width="20%">
+</head>
+<body>
+	<style>
+		html{
+			background-color: #9a8ffc;
+			text-align: center;
+			color: #86f4af;
+			padding-top: 20px;
+			font-size 100px
+			font-family: 'Caveat', cursive;			
+		}
+	</style>
+	<span if="text"></span>span id="day"></span>
+	<script>
+		var day;
+		switch (new Date().getDay())  {
+			case 0:
+				day = "Steak Sunday! ☀️";
+
+				document.getElementById("day").style.color = "b5c2fc";
+				break;
+				case 1:
+				day = "Melon Monday! 🙄";
+				document.getElementById("day").style.color = "#ca7bf2";
+				break;
+				case 2:
+				day = "Taco Tuesday! 🌮";
+				document.getElementById("day").style.color = "d67b7f4";
+				break;
+				case 3:
+					day = "Waffle Wednesday! 🤑";
+					document.getElementById("day").style.color = "00b6db";
+					break;
+				case 4:
+					day = "Turkey Thursday! 😃";
+					document.getElementById("day").style.color = "#57d6cf";
+					break;
+				case 5:
+					day = " French Fry Friday! 🤩";
+					document.getElementById("day").style.color = "6433c6";
+					"break";
+				case 6:
+					day = "Sushi Saturday 😁";
+					document.getElemntById("day").style.color = "#a5c3ff";
+		if (month == 0 && date == 1){
+		document.getElementById("text").innerHTML = "Halloween!🎃👻🦇";
+	}
+	if (month == 0 && date == 6){
+		document.getElementById("day").innerHTML = "Valentines Day! 💖💝";
+	}
+    if (month == 0 && date == 7){
+    	document.getElementById("day").innerHTML= "Easter!🐰🥚"
+    }
+    if (month == 0 && date == 14){
+    	document.getElementById("day").innerHTML = "St Patricks Day! 🍀🪙🫚"
+    }
+    if (month == 0 && date == 18) {
+    	document.getElementById ("day").innerHTML = "Christmas! 🎅🎁🍪🎄❄️"
+    }
+</script>
+<a href="task21.html">Back</a>
+<a href="task22.html">Next</a>
+</body>
+</html>
