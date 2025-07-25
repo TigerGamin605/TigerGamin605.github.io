@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&family=Indie+Flower&family=Caveat:wght@400&display=swap" rel="stylesheet">
+    <title>Today is...</title>
+    <img src="https://static.vecteezy.com/system/resources/previews/001/226/809/non_2x/close-up-of-a-calendar-free-photo.jpg"  alt="Calendar Image" width="20%"> <br>
+</head>
+<body>
+    <style>
+        html {
+            background-color: #9a8ffc;
+            text-align: center;
+            color: #86f4af;
+            padding-top: 20px;
+            font-size: 100px; /* Corrected: Added the missing colon */
+            font-family: 'Caveat', cursive; /* Now this font will actually load */
+        }
+    </style>
+
+    <span id="holidayText"></span>
+    <span id="dayText"></span>
+
+    <script>
+        // Get the current date details
+        var today = new Date();
+        var dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+        var month = today.getMonth();   // 0 = January, 1 = February, ..., 11 = December
+        var date = today.getDate();     // Day of the month (1-31)
+
+        var dayMessage = "";
+        var dayColor = "";
+
+        // Determine the message and color for the current day of the week
+        switch (dayOfWeek) {
+            case 0: // Sunday
+                dayMessage = "Steak Sunday! ☀️";
+                dayColor = "#b5c2fc";
+                break;
+            case 1: // Monday
+                dayMessage = "Melon Monday! 🙄";
+                dayColor = "#ca7bf2";
+                break;
+            case 2: // Tuesday
+                dayMessage = "Taco Tuesday! 🌮";
+                // Assuming 'd67b7f4' was intended to be a valid hex color
+                dayColor = "#d67bf4";
+                break;
+            case 3: // Wednesday
+                dayMessage = "Waffle Wednesday! 🤑";
+                dayColor = "#00b6db";
+                break;
+            case 4: // Thursday
+                dayMessage = "Turkey Thursday! 😃";
+                dayColor = "#57d6cf";
+                break;
+            case 5: // Friday
+                dayMessage = "French Fry Friday! 🤩";
+                dayColor = "#6433c6";
+                break; // Corrected: Removed quotes around 'break' keyword
+            case 6: // Saturday
+                dayMessage = "Sushi Saturday 😁";
+                dayColor = "#a5c3ff";
+                break;
+        }
+
+        // Display the day of the week message in the 'dayText' span
+        document.getElementById("dayText").innerHTML = dayMessage;
+        document.getElementById("dayText").style.color = dayColor;
+
+        // --- Holiday Logic ---
+        // This runs *after* the day of the week is determined.
+        // It uses the correct 0-indexed months for JavaScript dates.
+        var holidayMessage = "";
+
+        // Halloween: October 31st (month 9)
+        if (month === 9 && date === 31) {
+            holidayMessage = "Happy Halloween! 🎃👻🦇";
+        }
+        // Valentine's Day: February 14th (month 1)
+        else if (month === 1 && date === 14) {
+            holidayMessage = "Happy Valentine's Day! 💖💝";
+        }
+        // St. Patrick's Day: March 17th (month 2)
+        else if (month === 2 && date === 17) {
+            holidayMessage = "Happy St. Patrick's Day! 🍀🪙🇮🇪";
+        }
+        // Christmas: December 25th (month 11)
+        else if (month === 11 && date === 25) {
+            holidayMessage = "Merry Christmas! 🎅🎁🍪🎄❄️";
+        }
+        // New Year's Day: January 1st (month 0)
+        else if (month === 0 && date === 1) {
+            holidayMessage = "Happy New Year! 🎉🥂";
+        }
+        // Note: Easter changes yearly, so a simple fixed date check won't work for it.
+        // If you need Easter, you'd need a more complex date calculation.
+
+        // If a holiday message was found, display it in the 'holidayText' span
+        if (holidayMessage !== "") {
+            document.getElementById("holidayText").innerHTML = holidayMessage + "<br>"; // Add a line break for spacing
+            // You could also apply a specific style to the holiday text here if you want:
+            // document.getElementById("holidayText").style.color = "gold";
+        }
+    </script>
+
+    <a href="task21.html">Back</a>
+    <a href="task22.html">Next</a>
+</body>
+</html>
