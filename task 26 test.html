@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<body>
+<style>
+    html {
+        background-image: url(https://thumbs.dreamstime.com/b/lettering-beans-white-background-260173642.jpg);
+        background-repeat: no-repeat;
+        background-size: cover;
+        color: white;
+        font-size: 50px;
+        text-align: center;
+        padding-top: 200px;
+        height: 100vh;
+        margin: 0;
+        overflow: hidden;
+    }
+
+    button, a {
+        background: linear-gradient(to bottom, #AFB4E0, #8a90CB);
+        border: none;
+        color: #000000;
+        padding: 20px 40px;
+        font-size: 24px;
+        border-radius: 10px;
+        cursor: pointer;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+        font-weight: bold;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    button:hover, a:hover {
+        background: linear-gradient(to bottom, #FFFBFC, #E0E5FF);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    button:active, a:active {
+        transform: translateY(1px);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    #next {
+        position: absolute;
+        top: 50%;
+        right: 20px;
+        transform: translateY(-50%);
+    }
+
+    #back {
+        position: absolute;
+        top: 50%;
+        left: 20px;
+        transform: translateY(-50%);
+    }
+
+    #demo {
+        margin-top: 30px;
+        font-size: 36px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+</style>
+
+<p>Try to click the button to know how big your screen is!</p>
+
+<button onclick="myFunction()">Try it!</button>
+
+<audio id="myAudio" src="music/red sun.mp3"></audio>
+
+<p id="demo"></p>
+
+<script>
+function myFunction() {
+    var actualWidth = window.innerWidth || document.body.clientWidth;
+    document.getElementById("demo").innerHTML = "Your screen width is: " + actualWidth + "px";
+    playAudio();
+}
+
+function playAudio() {
+    var a = document.getElementById("myAudio");
+    if (a.paused) {
+        a.play();
+    }   
+}
+</script> 
+
+<a id="back" href="task 25.html">Back</a>
+<a id="next" href="task 27.html">Next</a>
+
+</body>
+</html>
