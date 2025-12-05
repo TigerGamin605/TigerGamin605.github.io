@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Hiragana Quiz</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        background: #f5f5f5;
+        padding: 40px;
+    }
+    #card {
+        display: inline-block;
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        width: 350px;
+    }
+    .choice {
+        display: block;
+        margin: 8px 0;
+        padding: 12px;
+        background: #e3e3ff;
+        border-radius: 8px;
+        cursor: pointer;
+        border: none;
+        width: 100%;
+        font-size: 18px;
+    }
+    .choice:hover {
+        background: #d4d4ff;
+    }
+    #score {
+        font-size: 20px;
+        margin-bottom: 15px;
+        font-weight: bold;
+    }
+    #hiragana {
+        font-size: 80px;
+        margin: 20px 0;
+    }
+    #feedback {
+        font-size: 24px;
+        margin-top: 15px;
+        height: 30px;
+        font-weight: bold;
+    }
+</style>
+</head>
+<body>
+
+<div id="score">Score: 0</div>
+
+<div id="card">
+    <div id="hiragana">あ</div>
+    <button class="choice"></button>
+    <button class="choice"></button>
+    <button class="choice"></button>
+    <button class="choice"></button>
+    <div id="feedback"></div>
+</div>
+
+<script>
+// Hiragana list
+const hiraganaList = [
+    ["あ", "a"], ["い", "i"], ["う", "u"], ["え", "e"], ["お", "o"],
+    ["か", "ka"], ["き", "ki"], ["く", "ku"], ["け", "ke"], ["こ", "ko"],
+    ["さ", "sa"], ["し", "shi"], ["す", "su"], ["せ", "se"], ["そ", "so"],
+    ["た", "ta"], ["ち", "chi"], ["つ", "tsu"], ["て", "te"], ["と", "to"],
+    ["な", "na"], ["に", "ni"], ["ぬ", "nu"], ["ね", "ne"], ["の", "no"],
+    ["は", "ha"], ["ひ", "hi"], ["ふ", "fu"], ["へ", "he"], ["ほ", "ho"],
+    ["ま", "ma"], ["み", "mi"], ["む", "mu"], ["め", "me"], ["も", "mo"],
+    ["や", "ya"], ["ゆ", "yu"], ["よ", "yo"],
+    ["ら", "ra"], ["り", "ri"], ["る", "ru"], ["れ", "re"], ["ろ", "ro"],
+    ["わ", "wa"], ["を", "wo"], ["ん", "n"]
+];
+
+let score = 0;
+const scoreBox = document.getElementById("score");
+const hiraBox = document.getElementById("hiragana");
+const choiceButtons = document.querySelectorAll(".choice");
+const feedback = document.getElementById("feedback");
+
+let currentCorrect;
+
+function newQuestion() {
+    feedback.textContent = ""; // Clear feedback
+
+    // Pick random hiragana
+    currentCorrect = hiraganaList[Math.floor(Math.random() * hiraganaList.length)];
+
+    // Show hiragana
+    hiraBox.textContent = currentCorrect[0];
+
+    // Generate wrong answers
+    let choices = [currentCorrect[1]];
+    while (choices.length < 4) {
+        let wrong = hiraganaList[Math.floor(Math.random() * hiraganaList.length)][1];
+        if (!choices.includes(wrong)) choices.push(wrong);
+    }
+
+    // Shuffle choices
+    choices.sort(() => Math.random() - 0.5);
+
+    // Set buttons
+    choiceButtons.forEach((btn, i) => {
+        btn.disabled = false;
+        btn.textContent = choices[i];
+
+        btn.onclick = () => {
+            choiceButtons.forEach(b => b.disabled = true); // Lock buttons
+
+            if (choices[i] === currentCorrect[1]) {
+                score++;
+                feedback.style.color = "green";
+                feedback.textContent = "Correct!";
+            } else {
+                score--;
+                feedback.style.color = "red";
+                feedback.textContent = "Wrong! Answer: " + currentCorrect[1];
+            }
+
+            scoreBox.textContent = "Score: " + score;
+
+            // Wait 1 second then load next question
+            setTimeout(newQuestion, 1000);
+        };
+    });
+}
+
+newQuestion();
+</script>
+
+</body>
+</html>
