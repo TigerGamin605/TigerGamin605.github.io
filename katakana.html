@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Katakana Quiz</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        background: #f5f5f5;
+        padding: 40px;
+    }
+    #card {
+        display: inline-block;
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        width: 350px;
+    }
+    .choice {
+        display: block;
+        margin: 8px 0;
+        padding: 12px;
+        background: #e3e3ff;
+        border-radius: 8px;
+        cursor: pointer;
+        border: none;
+        width: 100%;
+        font-size: 18px;
+    }
+    .choice:hover {
+        background: #d4d4ff;
+    }
+    #score {
+        font-size: 20px;
+        margin-bottom: 15px;
+        font-weight: bold;
+    }
+    #katakana {
+        font-size: 80px;
+        margin: 20px 0;
+    }
+    #feedback {
+        font-size: 24px;
+        margin-top: 15px;
+        height: 30px;
+        font-weight: bold;
+    }
+</style>
+</head>
+<body>
+
+<div id="score">Score: 0</div>
+
+<div id="card">
+    <div id="katakana">ア</div>
+    <button class="choice"></button>
+    <button class="choice"></button>
+    <button class="choice"></button>
+    <button class="choice"></button>
+    <div id="feedback"></div>
+</div>
+
+<script>
+// Katakana list
+const katakanaList = [
+    ["ア", "a"], ["イ", "i"], ["ウ", "u"], ["エ", "e"], ["オ", "o"],
+    ["カ", "ka"], ["キ", "ki"], ["ク", "ku"], ["ケ", "ke"], ["コ", "ko"],
+    ["サ", "sa"], ["シ", "shi"], ["ス", "su"], ["セ", "se"], ["ソ", "so"],
+    ["タ", "ta"], ["チ", "chi"], ["ツ", "tsu"], ["テ", "te"], ["ト", "to"],
+    ["ナ", "na"], ["ニ", "ni"], ["ヌ", "nu"], ["ネ", "ne"], ["ノ", "no"],
+    ["ハ", "ha"], ["ヒ", "hi"], ["フ", "fu"], ["ヘ", "he"], ["ホ", "ho"],
+    ["マ", "ma"], ["ミ", "mi"], ["ム", "mu"], ["メ", "me"], ["モ", "mo"],
+    ["ヤ", "ya"], ["ユ", "yu"], ["ヨ", "yo"],
+    ["ラ", "ra"], ["リ", "ri"], ["ル", "ru"], ["レ", "re"], ["ロ", "ro"],
+    ["ワ", "wa"], ["ヲ", "wo"], ["ン", "n"]
+];
+
+let score = 0;
+const scoreBox = document.getElementById("score");
+const kataBox = document.getElementById("katakana");
+const choiceButtons = document.querySelectorAll(".choice");
+const feedback = document.getElementById("feedback");
+
+let currentCorrect;
+
+function newQuestion() {
+    feedback.textContent = ""; // Clear feedback
+
+    currentCorrect = katakanaList[Math.floor(Math.random() * katakanaList.length)];
+    kataBox.textContent = currentCorrect[0];
+
+    let choices = [currentCorrect[1]];
+    while (choices.length < 4) {
+        let wrong = katakanaList[Math.floor(Math.random() * katakanaList.length)][1];
+        if (!choices.includes(wrong)) choices.push(wrong);
+    }
+
+    choices.sort(() => Math.random() - 0.5);
+
+    choiceButtons.forEach((btn, i) => {
+        btn.disabled = false;
+        btn.textContent = choices[i];
+
+        btn.onclick = () => {
+            choiceButtons.forEach(b => b.disabled = true);
+
+            if (choices[i] === currentCorrect[1]) {
+                score++;
+                feedback.style.color = "green";
+                feedback.textContent = "Correct!";
+            } else {
+                score--;
+                feedback.style.color = "red";
+                feedback.textContent = "Wrong! Answer: " + currentCorrect[1];
+            }
+
+            scoreBox.textContent = "Score: " + score;
+
+            setTimeout(newQuestion, 1000);
+        };
+    });
+}
+
+newQuestion();
+</script>
+
+</body>
+</html>
