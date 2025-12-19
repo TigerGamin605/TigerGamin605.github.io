@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Gem Quiz</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+    }
+
+    img {
+      width: 200px;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 12px;
+      margin-bottom: 15px;
+    }
+
+    .choices button {
+      display: block;
+      margin: 10px auto;
+      padding: 10px 20px;
+      width: 200px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 8px;
+      border: none;
+    }
+
+    .correct {
+      background-color: #2ecc71;
+    }
+
+    .wrong {
+      background-color: #e74c3c;
+    }
+
+    #score {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>💎 Gem Quiz</h1>
+
+  <img id="gemImage" src="" alt="Gem Image">
+
+  <h2 id="question"></h2>
+
+  <div class="choices" id="choices"></div>
+
+  <div id="score">Score: 0</div>
+
+  <script>
+    const quiz = [
+      {
+        image: "https://images.stockcake.com/public/c/4/3/c43dd237-3c75-4522-955c-70adf319cf4a_large/stunning-ruby-cluster-stockcake.jpg",
+        question: "What gem is this?",
+        choices: ["Ruby", "Sapphire", "Garnet", "Spinel"],
+        answer: "Ruby"
+      },
+      {
+        image: "https://www.creativefabrica.com/wp-content/uploads/2024/05/13/Green-Crystal-Clipart-Graphics-97545699-1-1-580x387.jpg",
+        question: "What gem is this?",
+        choices: ["Peridot", "Emerald", "Jade", "Tourmaline"],
+        answer: "Emerald"
+      },
+      {
+        image: "https://i.etsystatic.com/iap/72623b/2418601523/iap_fullxfull.2418601523_n4ipm29k.jpg?version=0",
+        question: "What gem is this?",
+        choices: ["Amethyst", "Fluorite", "Quartz", "Topaz"],
+        answer: "Amethyst"
+      }
+    ];
+
+    let score = 0;
+    let index = 0;
+
+    const gemImage = document.getElementById("gemImage");
+    const questionEl = document.getElementById("question");
+    const choicesEl = document.getElementById("choices");
+    const scoreEl = document.getElementById("score");
+
+    function loadQuestion() {
+      const q = quiz[index];
+
+      gemImage.src = q.image;
+      questionEl.textContent = q.question;
+      choicesEl.innerHTML = "";
+
+      q.choices.forEach(choice => {
+        const btn = document.createElement("button");
+        btn.textContent = choice;
+        btn.onclick = () => checkAnswer(btn, choice, q.answer);
+        choicesEl.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(button, choice, answer) {
+      const buttons = document.querySelectorAll(".choices button");
+
+      buttons.forEach(btn => btn.disabled = true);
+
+      if (choice === answer) {
+        button.classList.add("correct");
+        score++;
+      } else {
+        button.classList.add("wrong");
+        buttons.forEach(btn => {
+          if (btn.textContent === answer) {
+            btn.classList.add("correct");
+          }
+        });
+      }
+
+      scoreEl.textContent = "Score: " + score;
+
+      setTimeout(() => {
+        index = (index + 1) % quiz.length; // infinite loop
+        loadQuestion();
+      }, 1000);
+    }
+
+    loadQuestion();
+  </script>
+
+</body>
+</html>
