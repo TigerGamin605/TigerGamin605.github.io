@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pokémon Tycoon</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: url('https://images.squarespace-cdn.com/content/v1/613ef8a0a3de987d28d14431/1662051124297-VAO30XSO47Z7HPVSYSEV/Pokemon_SV_Worldmap.jpg') no-repeat center center fixed;
+  background-size: cover;
+  overflow: hidden;
+  height: 100vh;
+}
+
+#top {
+  background: rgba(255,255,255,0.9);
+  padding: 10px;
+  font-size: 20px;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 1000;
+}
+
+#shop {
+  background: rgba(238,238,238,0.9);
+  padding: 10px;
+  position: fixed;
+  top: 50px;
+  width: 100%;
+  z-index: 1000;
+}
+
+.pokemon {
+  position: absolute;
+  width: 96px;
+  transition: transform 1s linear;
+}
+
+.shiny {
+  filter: hue-rotate(120deg) brightness(1.2);
+}
+
+button {
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+#adminPanel {
+  background: #ffc;
+  padding: 10px;
+  display: none;
+  margin-top: 10px;
+  border: 2px solid #cc0;
+  position: fixed;
+  top: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+}
+
+#farm {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  margin-top: 120px; /* offset for top menu */
+}
+</style>
+</head>
+
+<body>
+
+<div id="top">
+  💰 Money: $<span id="money">100</span>
+</div>
+
+<div id="shop">
+  <input id="search" placeholder="Search Pokémon (name or ID)">
+  <button onclick="buyPokemon()">Buy Pokémon</button>
+  <button onclick="resetGame()">Reset Game</button>
+  <button onclick="unlockAdmin()">Admin Panel</button>
+</div>
+
+<div id="farm"></div>
+
+<div id="adminPanel">
+  <h3>Admin Panel</h3>
+  <button onclick="money += 1000; updateMoney(); saveGame()">Add $1000</button>
+  <button onclick="resetGame()">Reset Game</button>
+  <button onclick="addLegendary()">Add Random Legendary</button>
+</div>
+
+<script>
+let money = 100;
+let ownedPokemon = [];
+
+const EVOLVE_COST = 200;
+
+const RARITY_RULES = {
+  common:   { earn: 0.3, shiny: 0.01, cost: 30 },
+  uncommon: { earn: 0.7, shiny: 0.02, cost: 10 },
+  rare:     { earn: 1.5, shiny: 0.05, cost: 50 },
+  legendary:{ earn: 5, shiny: 0.10, cost: 1000 }
+};
+
+function getRarity(id) {
+  if ((id >= 144 && id <= 151) || (id >= 243 && id <= 251) || (id >= 377 && id <= 386) || id >= 480)
+    return "legendary";
+  if (id < 200) return "common";
+  if (id < 500) return "uncommon";
+  return "rare";
+}
+
+// Buy Pokémon
+async function buyPokemon() {
+  const input = document.getElementById("search").value.toLowerCase().trim();
+  if (!input) return;
+
+  const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${input}`);
+  if (!res.ok) return alert("Pokémon not found!");
+
+  const data = await res.json();
+  const rarity = getRarity(data.id);
+  const price = RARITY_RULES[rarity].cost;
+
+  if (money < price) return alert(`Not enough money! Cost: $${price}`);
+
+  const shiny = Math.random() < RARITY_RULES[rarity].shiny;
+  money -= price;
+  updateMoney();
+
+  // Random initial position
+  const farm = document.getElementById("farm");
+  const x = Math.random() * (farm.clientWidth - 100);
+  const y = Math.random() * (farm.clientHeight - 100);
+
+  ownedPokemon.push({
+    id: data.id,
+    name: data.name,
+    img: shiny ? data.sprites.front_shiny : data.sprites.front_default,
+    earn: RARITY_RULES[rarity].earn,
+    shiny,
+    level: 1,
+    upgradeCost: 100,
+    evolutionsDone: 0,
+    maxEvolutions: 0, // we will fetch this from API
+    price,
+    x, y
+  });
+
+  // Fetch evolution chain info
+  fetchEvolutionChain(data.id, ownedPokemon.length - 1);
+
+  renderFarm();
+  saveGame();
+}
+
+// Fetch evolution chain to allow multiple evolutions
+async function fetchEvolutionChain(pokemonId, index) {
+  const speciesRes = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${pokemonId}`);
+  const species = await speciesRes.json();
+  const evoRes = await fetch(species.evolution_chain.url);
+  const evoData = await evoRes.json();
+
+  function countEvolutions(chain, currentName) {
+    if (chain.species.name === currentName) {
+      return chain.evolves_to.length;
+    }
+    for (const e of chain.evolves_to) {
+      const next = countEvolutions(e, currentName);
+      if (next !== null) return next;
+    }
+    return null;
+  }
+
+  // Count remaining evolutions for this Pokémon
+  const remaining = countRemainingEvolutions(evoData.chain, ownedPokemon[index].name);
+  ownedPokemon[index].maxEvolutions = remaining;
+  saveGame();
+}
+
+// Recursive function to count remaining evolutions
+function countRemainingEvolutions(chain, currentName) {
+  if (chain.species.name === currentName) {
+    return countChainDepth(chain) - 1; // -1 because current stage counts
+  }
+  for (const e of chain.evolves_to) {
+    const next = countRemainingEvolutions(e, currentName);
+    if (next !== null) return next;
+  }
+  return 0;
+}
+
+// Count total evolutions in chain
+function countChainDepth(chain) {
+  if (!chain.evolves_to.length) return 1;
+  return 1 + Math.max(...chain.evolves_to.map(c => countChainDepth(c)));
+}
+
+// Render Pokémon
+function renderFarm() {
+  const farm = document.getElementById("farm");
+  farm.innerHTML = "";
+
+  ownedPokemon.forEach((p, i) => {
+    const div = document.createElement("div");
+    div.className = "pokemon" + (p.shiny ? " shiny" : "");
+    div.style.left = p.x + "px";
+    div.style.top = p.y + "px";
+
+    const rarity = getRarity(p.id);
+    let sellPrice = 0;
+    if (rarity === "common") sellPrice = 1;
+    else if (rarity === "uncommon") sellPrice = 3;
+    else if (rarity === "rare") sellPrice = 20;
+    else if (rarity === "legendary") sellPrice = 500;
+
+    div.innerHTML = `
+      <img src="${p.img}">
+      <div><strong>${p.name}</strong></div>
+      <div>+$${p.earn.toFixed(1)}/sec</div>
+      <div>Lvl ${p.level}</div>
+      <button onclick="upgradePokemon(${i})">Upgrade ($${p.upgradeCost})</button>
+      ${p.evolutionsDone < p.maxEvolutions ? `<button onclick="evolvePokemon(${i})">Evolve ($${EVOLVE_COST})</button>` : ""}
+      <button onclick="sellPokemon(${i})">Sell ($${sellPrice})</button>
+    `;
+
+    farm.appendChild(div);
+  });
+}
+
+// Pokémon movement
+function movePokemon() {
+  const farm = document.getElementById("farm");
+  ownedPokemon.forEach(p => {
+    p.x += (Math.random() - 0.5) * 20;
+    p.y += (Math.random() - 0.5) * 20;
+    p.x = Math.max(0, Math.min(p.x, farm.clientWidth - 100));
+    p.y = Math.max(0, Math.min(p.y, farm.clientHeight - 100));
+  });
+  renderFarm();
+}
+setInterval(movePokemon, 1000);
+
+function upgradePokemon(i) {
+  const p = ownedPokemon[i];
+  if (money < p.upgradeCost) return alert("Not enough money!");
+  money -= p.upgradeCost;
+  p.level++;
+  p.earn *= 1.5;
+  p.upgradeCost = Math.floor(p.upgradeCost * 1.7);
+  updateMoney();
+  renderFarm();
+  saveGame();
+}
+
+// Evolution
+async function evolvePokemon(i) {
+  if (money < EVOLVE_COST) return alert("Not enough money!");
+  const p = ownedPokemon[i];
+  const speciesRes = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${p.id}`);
+  const species = await speciesRes.json();
+  const evoRes = await fetch(species.evolution_chain.url);
+  const evoData = await evoRes.json();
+
+  function findNextEvolution(chain, currentName) {
+    if (chain.species.name === currentName) {
+      if (chain.evolves_to.length > 0) return chain.evolves_to[0].species.name;
+      else return null;
+    }
+    for (const e of chain.evolves_to) {
+      const next = findNextEvolution(e, currentName);
+      if (next) return next;
+    }
+    return null;
+  }
+
+  const nextName = findNextEvolution(evoData.chain, p.name);
+  if (!nextName) return alert("No evolution available!");
+
+  const pokeRes = await fetch(`https://pokeapi.co/api/v2/pokemon/${nextName}`);
+  const newData = await pokeRes.json();
+
+  money -= EVOLVE_COST;
+  p.name = newData.name;
+  p.img = p.shiny ? newData.sprites.front_shiny : newData.sprites.front_default;
+  p.earn *= 2;
+  p.evolutionsDone++;
+  p.id = newData.id; // update ID for rarity
+  renderFarm();
+  updateMoney();
+  saveGame();
+}
+
+// Sell Pokémon
+function sellPokemon(i) {
+  const p = ownedPokemon[i];
+  const rarity = getRarity(p.id);
+  let sellPrice = 0;
+  if (rarity === "common") sellPrice = 1;
+  else if (rarity === "uncommon") sellPrice = 3;
+  else if (rarity === "rare") sellPrice = 20;
+  else if (rarity === "legendary") sellPrice = 500;
+
+  money += sellPrice;
+  ownedPokemon.splice(i, 1);
+  updateMoney();
+  renderFarm();
+  saveGame();
+}
+
+function resetGame() {
+  if (!confirm("Are you sure you want to reset your game?")) return;
+  money = 100;
+  ownedPokemon = [];
+  localStorage.removeItem("pokemonTycoonSave");
+  updateMoney();
+  renderFarm();
+}
+
+function updateMoney() {
+  document.getElementById("money").textContent = Math.floor(money);
+}
+
+// Idle earnings
+setInterval(() => {
+  ownedPokemon.forEach(p => money += p.earn);
+  updateMoney();
+  saveGame();
+}, 1000);
+
+function saveGame() {
+  localStorage.setItem("pokemonTycoonSave", JSON.stringify({ money, ownedPokemon }));
+}
+
+function loadGame() {
+  const save = JSON.parse(localStorage.getItem("pokemonTycoonSave"));
+  if (!save) return;
+  money = save.money;
+  ownedPokemon = save.ownedPokemon;
+  updateMoney();
+  renderFarm();
+}
+
+loadGame();
+
+// Admin
+function unlockAdmin() {
+  const code = prompt("Enter admin code:");
+  if (code === "banana fish") {
+    document.getElementById("adminPanel").style.display = "block";
+    alert("Admin panel unlocked!");
+  } else {
+    alert("Wrong code!");
+  }
+}
+
+async function addLegendary() {
+  const legendaries = [144,145,146,147,148,149,150,151,243,244,245,246,247,248,249,250,251,377,378,379,380,381,382,383,384,385,386];
+  const id = legendaries[Math.floor(Math.random()*legendaries.length)];
+  const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+  const data = await res.json();
+  const shiny = Math.random() < 0.1;
+
+  const farm = document.getElementById("farm");
+  const x = Math.random() * (farm.clientWidth - 100);
+  const y = Math.random() * (farm.clientHeight - 100);
+
+  ownedPokemon.push({
+    id: data.id,
+    name: data.name,
+    img: shiny ? data.sprites.front_shiny : data.sprites.front_default,
+    earn: RARITY_RULES.legendary.earn,
+    shiny,
+    level: 1,
+    upgradeCost: 100,
+    evolutionsDone: 0,
+    maxEvolutions: 0,
+    price: RARITY_RULES.legendary.cost,
+    x, y
+  });
+
+  fetchEvolutionChain(data.id, ownedPokemon.length - 1);
+  renderFarm();
+  saveGame();
+}
+</script>
+
+</body>
+</html>

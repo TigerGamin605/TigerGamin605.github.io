@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pokémon Tycoon</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #bdecb6;
+  text-align: center;
+}
+
+#top {
+  background: #fff;
+  padding: 10px;
+  font-size: 20px;
+  position: sticky;
+  top: 0;
+}
+
+#shop {
+  background: #eee;
+  padding: 10px;
+}
+
+#farm {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  padding: 20px;
+}
+
+.pokemon {
+  width: 96px;
+  background: white;
+  border-radius: 10px;
+  padding: 5px;
+  animation: wander 6s infinite alternate ease-in-out;
+}
+
+.pokemon img {
+  width: 96px;
+}
+
+.shiny {
+  filter: hue-rotate(120deg) brightness(1.2);
+}
+
+@keyframes wander {
+  from { transform: translateX(-10px); }
+  to { transform: translateX(10px); }
+}
+</style>
+</head>
+
+<body>
+
+<div id="top">
+  💰 Money: $<span id="money">0</span>
+</div>
+
+<div id="shop">
+  <input id="search" placeholder="Search Pokémon (name or ID)">
+  <button onclick="buyPokemon()">Buy Pokémon ($100)</button>
+</div>
+
+<div id="farm"></div>
+
+<script>
+let money = 0;
+let ownedPokemon = [];
+
+const RARITY_RULES = {
+  common: { earn: 1, shiny: 0.01 },
+  uncommon: { earn: 3, shiny: 0.02 },
+  rare: { earn: 7, shiny: 0.05 },
+  legendary: { earn: 15, shiny: 0.10 }
+};
+
+function getRarity(id) {
+  if (id >= 144 && id <= 151 || id >= 243 && id <= 251 || id >= 377)
+    return "legendary";
+  if (id < 200) return "common";
+  if (id < 500) return "uncommon";
+  return "rare";
+}
+
+async function buyPokemon() {
+  if (money < 100) {
+    alert("Not enough money!");
+    return;
+  }
+
+  const input = document.getElementById("search").value.toLowerCase().trim();
+  if (!input) return;
+
+  const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${input}`);
+  if (!res.ok) return alert("Pokémon not found");
+
+  const data = await res.json();
+  const rarity = getRarity(data.id);
+  const shiny = Math.random() < RARITY_RULES[rarity].shiny;
+
+  money -= 100;
+  updateMoney();
+
+  const poke = {
+    name: data.name,
+    img: shiny ? data.sprites.front_shiny : data.sprites.front_default,
+    earn: RARITY_RULES[rarity].earn,
+    shiny
+  };
+
+  ownedPokemon.push(poke);
+  renderPokemon(poke);
+  saveGame();
+}
+
+function renderPokemon(poke) {
+  const div = document.createElement("div");
+  div.className = "pokemon" + (poke.shiny ? " shiny" : "");
+  div.innerHTML = `
+    <img src="${poke.img}">
+    <div>${poke.name}</div>
+    <small>+$${poke.earn}/sec</small>
+  `;
+  document.getElementById("farm").appendChild(div);
+}
+
+function updateMoney() {
+  document.getElementById("money").textContent = money.toFixed(0);
+}
+
+setInterval(() => {
+  ownedPokemon.forEach(p => money += p.earn);
+  updateMoney();
+  saveGame();
+}, 1000);
+
+function saveGame() {
+  localStorage.setItem("pokemonTycoon", JSON.stringify({
+    money,
+    ownedPokemon
+  }));
+}
+
+function loadGame() {
+  const save = JSON.parse(localStorage.getItem("pokemonTycoon"));
+  if (!save) return;
+
+  money = save.money;
+  ownedPokemon = save.ownedPokemon;
+  updateMoney();
+
+  ownedPokemon.forEach(renderPokemon);
+}
+
+loadGame();
+</script>
+
+</body>
+</html>

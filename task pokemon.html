@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Who's That Pokémon?</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f0f0f0;
+    }
+
+    img {
+      width: 300px;
+      filter: brightness(0);
+    }
+
+    .reveal {
+      filter: brightness(1);
+    }
+
+    #score {
+      font-size: 24px;
+      margin: 10px;
+    }
+
+    #message {
+      font-size: 20px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Who's That Pokémon?</h1>
+<div id="score">Score: 0</div>
+
+<img id="pokemonImage" src="" alt="Pokemon">
+
+<div>
+  <input type="text" id="guessInput" placeholder="Enter Pokémon name">
+  <button onclick="checkAnswer()">Guess</button>
+</div>
+
+<div id="message">Loading Pokémon...</div>
+
+<script>
+  const BASE_POKEMON = [
+    151, 320, 321, 571, 717, 718 // mew, wailmer, wailord, zoroark, yveltal, zygarde
+  ];
+
+  const TOTAL_RANDOM = 100;
+  const MAX_POKEMON_ID = 1010;
+
+  let pokemonList = [];
+  let shuffledPool = [];
+  let currentPokemon;
+  let score = 0;
+  let locked = false;
+
+  function shuffleArray(array) {
+    return array
+      .map(p => ({ p, r: Math.random() }))
+      .sort((a, b) => a.r - b.r)
+      .map(x => x.p);
+  }
+
+  async function loadPokemon() {
+    const ids = new Set(BASE_POKEMON);
+
+    while (ids.size < BASE_POKEMON.length + TOTAL_RANDOM) {
+      ids.add(Math.floor(Math.random() * MAX_POKEMON_ID) + 1);
+    }
+
+    for (const id of ids) {
+      const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+      const data = await res.json();
+
+      pokemonList.push({
+        name: data.name.toLowerCase(),
+        img: data.sprites.front_default
+      });
+    }
+
+    shuffledPool = shuffleArray([...pokemonList]);
+    nextQuestion();
+  }
+
+  function nextQuestion() {
+    locked = false;
+    document.getElementById("message").textContent = "";
+    document.getElementById("guessInput").value = "";
+
+    if (shuffledPool.length === 0) {
+      shuffledPool = shuffleArray([...pokemonList]);
+    }
+
+    currentPokemon = shuffledPool.pop();
+
+    const img = document.getElementById("pokemonImage");
+    img.src = currentPokemon.img;
+    img.classList.remove("reveal");
+  }
+
+  function checkAnswer() {
+    if (locked) return;
+    locked = true;
+
+    const guess = document.getElementById("guessInput").value.toLowerCase().trim();
+    const img = document.getElementById("pokemonImage");
+
+    img.classList.add("reveal");
+
+    if (guess === currentPokemon.name) {
+      score++;
+      document.getElementById("message").textContent = "Correct!";
+    } else {
+      document.getElementById("message").textContent =
+        `Wrong! It was ${currentPokemon.name.toUpperCase()}`;
+    }
+
+    document.getElementById("score").textContent = `Score: ${score}`;
+    setTimeout(nextQuestion, 1000);
+  }
+
+  loadPokemon();
+</script>
+
+</body>
+</html>

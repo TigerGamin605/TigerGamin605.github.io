@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Pokémon Info Viewer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #eef2f3;
+      text-align: center;
+    }
+
+    input, button {
+      padding: 8px;
+      font-size: 16px;
+      margin: 5px;
+    }
+
+    #card {
+      background: white;
+      width: 320px;
+      margin: 20px auto;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+      display: none;
+    }
+
+    img {
+      width: 120px;
+    }
+
+    .type {
+      display: inline-block;
+      padding: 4px 10px;
+      margin: 3px;
+      border-radius: 12px;
+      background: #ddd;
+      font-weight: bold;
+    }
+
+    .section {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>📘 Pokémon Info Viewer</h1>
+
+<input id="search" placeholder="Name or ID (e.g. pikachu / 25)">
+<button onclick="loadPokemon()">Search</button>
+
+<div id="card">
+  <h2 id="name"></h2>
+  <img id="sprite">
+
+  <div class="section">
+    <strong>Types:</strong>
+    <div id="types"></div>
+  </div>
+
+  <div class="section">
+    <strong>Weaknesses:</strong>
+    <div id="weaknesses"></div>
+  </div>
+
+  <div class="section">
+    <strong>Stats:</strong>
+    <div id="stats"></div>
+  </div>
+
+  <div class="section">
+    <strong>Height:</strong> <span id="height"></span> m<br>
+    <strong>Weight:</strong> <span id="weight"></span> kg
+  </div>
+</div>
+
+<script>
+  async function loadPokemon() {
+    const input = document.getElementById("search").value.toLowerCase().trim();
+    if (!input) return;
+
+    try {
+      const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${input}`);
+      if (!res.ok) throw new Error();
+
+      const data = await res.json();
+
+      document.getElementById("card").style.display = "block";
+      document.getElementById("name").textContent =
+        `${data.name.toUpperCase()} #${data.id}`;
+      document.getElementById("sprite").src =
+        data.sprites.front_default;
+
+      // TYPES
+      const typesDiv = document.getElementById("types");
+      typesDiv.innerHTML = "";
+      const types = data.types.map(t => t.type.name);
+
+      types.forEach(t => {
+        const span = document.createElement("span");
+        span.className = "type";
+        span.textContent = t;
+        typesDiv.appendChild(span);
+      });
+
+      // WEAKNESSES
+      const weaknesses = new Set();
+
+      for (const type of types) {
+        const typeRes = await fetch(`https://pokeapi.co/api/v2/type/${type}`);
+        const typeData = await typeRes.json();
+
+        typeData.damage_relations.double_damage_from.forEach(w =>
+          weaknesses.add(w.name)
+        );
+      }
+
+      const weakDiv = document.getElementById("weaknesses");
+      weakDiv.innerHTML = "";
+      weaknesses.forEach(w => {
+        const span = document.createElement("span");
+        span.className = "type";
+        span.textContent = w;
+        weakDiv.appendChild(span);
+      });
+
+      // STATS
+      const statsDiv = document.getElementById("stats");
+      statsDiv.innerHTML = "";
+      data.stats.forEach(s => {
+        statsDiv.innerHTML +=
+          `${s.stat.name.toUpperCase()}: ${s.base_stat}<br>`;
+      });
+
+      document.getElementById("height").textContent = data.height / 10;
+      document.getElementById("weight").textContent = data.weight / 10;
+
+    } catch {
+      alert("Pokémon not found!");
+    }
+  }
+
+  document.getElementById("search").addEventListener("keydown", e => {
+    if (e.key === "Enter") loadPokemon();
+  });
+</script>
+
+</body>
+</html>
