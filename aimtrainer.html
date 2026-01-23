@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Aim Trainer FPS</title>
+
+<style>
+body {
+  margin: 0;
+  background: #0f172a;
+  color: white;
+  font-family: Arial, sans-serif;
+  overflow: hidden;
+}
+
+#game {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+}
+
+/* HUD */
+#hud {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 20px;
+  background: rgba(0,0,0,0.5);
+  padding: 8px 14px;
+  border-radius: 10px;
+  z-index: 10;
+}
+
+/* MENU */
+#menu {
+  position: fixed;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.6);
+  padding: 10px;
+  border-radius: 10px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  z-index: 10;
+}
+
+select, button {
+  background: #1e293b;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+
+/* TARGET */
+.target {
+  position: absolute;
+  background: #38bdf8;
+  box-shadow: 0 0 12px #38bdf8;
+}
+
+/* CROSSHAIR */
+#crosshair {
+  position: fixed;
+  width: 26px;
+  height: 26px;
+  pointer-events: none;
+  z-index: 5;
+}
+
+#crosshair::before,
+#crosshair::after {
+  content: "";
+  position: absolute;
+  background: white;
+}
+
+#crosshair::before {
+  width: 2px;
+  height: 26px;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+}
+
+#crosshair::after {
+  height: 2px;
+  width: 26px;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+}
+</style>
+</head>
+
+<body>
+
+<div id="game"></div>
+<div id="crosshair"></div>
+
+<div id="hud">
+  <div>🎯 Score: <span id="score">0</span></div>
+  <div>❌ Misses: <span id="misses">0</span></div>
+  <div>⏱️ Time: <span id="time">30</span></div>
+</div>
+
+<div id="menu">
+  <select id="mode">
+    <option value="timed">Timed (30s)</option>
+    <option value="endless">Endless</option>
+  </select>
+
+  <select id="size">
+    <option value="20">Small</option>
+    <option value="35" selected>Medium</option>
+    <option value="60">Large</option>
+  </select>
+
+  <button onclick="startGame()">Start</button>
+  <span>🛞 = Toggle Mouse</span>
+</div>
+
+<script>
+const game = document.getElementById("game");
+const crosshair = document.getElementById("crosshair");
+
+let score = 0;
+let misses = 0;
+let timeLeft = 30;
+let timer = null;
+let active = false;
+
+let crossX = window.innerWidth / 2;
+let crossY = window.innerHeight / 2;
+
+let target = null;
+let mouseLocked = false;
+
+// START
+function startGame() {
+  clearInterval(timer);
+  game.innerHTML = "";
+  score = 0;
+  misses = 0;
+  timeLeft = 30;
+  active = true;
+
+  crossX = window.innerWidth / 2;
+  crossY = window.innerHeight / 2;
+  updateCrosshair();
+
+  spawnTarget();
+  updateHUD();
+
+  if (document.getElementById("mode").value === "timed") {
+    timer = setInterval(() => {
+      timeLeft--;
+      updateHUD();
+      if (timeLeft <= 0) endGame();
+    }, 1000);
+  }
+}
+
+// END
+function endGame() {
+  active = false;
+  clearInterval(timer);
+  document.exitPointerLock();
+  alert(`Game Over!\nScore: ${score}\nMisses: ${misses}`);
+}
+
+// SPAWN TARGET
+function spawnTarget() {
+  if (target) target.remove();
+
+  const size = Number(document.getElementById("size").value);
+  target = document.createElement("div");
+  target.className = "target";
+  target.style.width = size + "px";
+  target.style.height = size + "px";
+
+  target.style.left = Math.random() * (window.innerWidth - size) + "px";
+  target.style.top = Math.random() * (window.innerHeight - size) + "px";
+
+  game.appendChild(target);
+}
+
+// POINTER LOCK TOGGLE (MIDDLE CLICK)
+document.addEventListener("mousedown", (e) => {
+  if (e.button === 1) {
+    e.preventDefault();
+    if (!mouseLocked) {
+      game.requestPointerLock();
+    } else {
+      document.exitPointerLock();
+    }
+  }
+});
+
+// POINTER LOCK STATE
+document.addEventListener("pointerlockchange", () => {
+  mouseLocked = document.pointerLockElement === game;
+});
+
+// AIM MOVEMENT
+document.addEventListener("mousemove", (e) => {
+  if (!mouseLocked || !active) return;
+
+  crossX += e.movementX;
+  crossY += e.movementY;
+
+  crossX = Math.max(0, Math.min(window.innerWidth, crossX));
+  crossY = Math.max(0, Math.min(window.innerHeight, crossY));
+
+  updateCrosshair();
+});
+
+// SHOOT
+document.addEventListener("mousedown", (e) => {
+  if (!active || e.button !== 0) return;
+
+  const rect = target.getBoundingClientRect();
+
+  if (
+    crossX >= rect.left &&
+    crossX <= rect.right &&
+    crossY >= rect.top &&
+    crossY <= rect.bottom
+  ) {
+    score++;
+    spawnTarget();
+  } else {
+    misses++;
+  }
+
+  updateHUD();
+});
+
+// UPDATE UI
+function updateCrosshair() {
+  crosshair.style.left = crossX + "px";
+  crosshair.style.top = crossY + "px";
+}
+
+function updateHUD() {
+  document.getElementById("score").textContent = score;
+  document.getElementById("misses").textContent = misses;
+  document.getElementById("time").textContent = timeLeft;
+}
+</script>
+
+</body>
+</html>
