@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Times Table Test</title>
+
+<style>
+
+body{
+font-family: Arial;
+text-align:center;
+background:#f2f2f2;
+margin:0;
+padding:20px;
+}
+
+h1{
+font-size:32px;
+}
+
+#question{
+font-size:42px;
+margin:20px;
+font-weight:bold;
+}
+
+#answerBox{
+font-size:36px;
+height:50px;
+width:200px;
+margin:auto;
+border:2px solid #333;
+border-radius:10px;
+line-height:50px;
+background:white;
+}
+
+#timer,#score{
+font-size:22px;
+margin:10px;
+}
+
+#keypad{
+margin-top:25px;
+display:grid;
+grid-template-columns:repeat(3,80px);
+gap:10px;
+justify-content:center;
+}
+
+button{
+font-size:26px;
+padding:15px;
+border:none;
+border-radius:12px;
+background:#ffffff;
+box-shadow:0 3px 6px rgba(0,0,0,0.2);
+}
+
+button:active{
+background:#ddd;
+}
+
+#submit{
+grid-column: span 3;
+background:#4CAF50;
+color:white;
+font-size:24px;
+}
+
+#clear{
+background:#ff6b6b;
+color:white;
+}
+
+#start{
+margin-top:20px;
+font-size:20px;
+padding:10px 25px;
+background:#2196F3;
+color:white;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>Times Table Test</h1>
+
+<div id="timer">Time: 60</div>
+<div id="score">Score: 0</div>
+
+<div id="question">Press Start</div>
+
+<div id="answerBox"></div>
+
+<button id="start" onclick="startGame()">Start</button>
+
+<div id="keypad">
+
+<button onclick="press(1)">1</button>
+<button onclick="press(2)">2</button>
+<button onclick="press(3)">3</button>
+
+<button onclick="press(4)">4</button>
+<button onclick="press(5)">5</button>
+<button onclick="press(6)">6</button>
+
+<button onclick="press(7)">7</button>
+<button onclick="press(8)">8</button>
+<button onclick="press(9)">9</button>
+
+<button id="clear" onclick="clearAnswer()">C</button>
+<button onclick="press(0)">0</button>
+<button onclick="backspace()">⌫</button>
+
+<button id="submit" onclick="submitAnswer()">Enter</button>
+
+</div>
+
+<script>
+
+let num1,num2
+let score=0
+let time=60
+let timer
+let answer=""
+
+function newQuestion(){
+num1=Math.floor(Math.random()*12)+1
+num2=Math.floor(Math.random()*12)+1
+document.getElementById("question").textContent=num1+" × "+num2
+}
+
+function startGame(){
+
+score=0
+time=60
+answer=""
+
+document.getElementById("score").textContent="Score: "+score
+document.getElementById("timer").textContent="Time: "+time
+document.getElementById("answerBox").textContent=""
+
+newQuestion()
+
+timer=setInterval(()=>{
+
+time--
+document.getElementById("timer").textContent="Time: "+time
+
+if(time<=0){
+
+clearInterval(timer)
+document.getElementById("question").textContent="Time's up!"
+alert("Final Score: "+score)
+
+}
+
+},1000)
+
+}
+
+function press(num){
+
+answer+=num
+document.getElementById("answerBox").textContent=answer
+
+}
+
+function clearAnswer(){
+
+answer=""
+document.getElementById("answerBox").textContent=""
+
+}
+
+function backspace(){
+
+answer=answer.slice(0,-1)
+document.getElementById("answerBox").textContent=answer
+
+}
+
+function submitAnswer(){
+
+if(answer=="") return
+
+if(parseInt(answer)===num1*num2){
+
+score++
+document.getElementById("score").textContent="Score: "+score
+
+}
+
+answer=""
+document.getElementById("answerBox").textContent=""
+
+newQuestion()
+
+}
+
+</script>
+
+</body>
+</html>

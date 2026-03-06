@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Pokopia 2D</title>
+
+<style>
+body{
+background:#222;
+color:white;
+font-family:Arial;
+text-align:center;
+}
+
+canvas{
+background:lightgreen;
+display:block;
+margin:auto;
+border:3px solid black;
+}
+
+#menu{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+background:#333;
+padding:20px;
+border-radius:10px;
+display:none;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Pokopia Demo</h2>
+
+<canvas id="game" width="800" height="600"></canvas>
+
+<div id="menu">
+<h3>Keybind Menu</h3>
+
+<p>Switch Character: <span id="switchKey">E</span></p>
+<button onclick="changeKey('switch')">Change</button>
+
+<p>Open Menu: <span id="menuKey">K</span></p>
+<button onclick="changeKey('menu')">Change</button>
+
+<br><br>
+<button onclick="toggleMenu()">Close</button>
+</div>
+
+<script>
+
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+let player={
+x:400,
+y:300,
+size:64,
+speed:5,
+form:"ditto"
+};
+
+let pokopia={
+x:Math.random()*750,
+y:Math.random()*550,
+size:30,
+caught:false
+};
+
+let keys={};
+
+let keybinds={
+switch:"e",
+menu:"k"
+};
+
+let waitingForKey=null;
+
+/* SPRITES */
+
+const dittoSprite=new Image();
+dittoSprite.src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/132.png";
+
+const humanSprite=new Image();
+humanSprite.src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png"; 
+// using Pikachu sprite as placeholder trainer
+
+document.addEventListener("keydown",e=>{
+
+keys[e.key]=true;
+
+if(waitingForKey){
+keybinds[waitingForKey]=e.key;
+updateMenuText();
+waitingForKey=null;
+return;
+}
+
+if(e.key===keybinds.switch){
+toggleForm();
+}
+
+if(e.key===keybinds.menu){
+toggleMenu();
+}
+
+});
+
+document.addEventListener("keyup",e=>{
+keys[e.key]=false;
+});
+
+function toggleForm(){
+
+if(player.form==="ditto"){
+player.form="human";
+}else{
+player.form="ditto";
+}
+
+}
+
+function toggleMenu(){
+
+let menu=document.getElementById("menu");
+
+menu.style.display = menu.style.display==="none" ? "block" : "none";
+
+}
+
+function changeKey(action){
+waitingForKey=action;
+alert("Press a key");
+}
+
+function updateMenuText(){
+
+document.getElementById("switchKey").innerText=keybinds.switch.toUpperCase();
+document.getElementById("menuKey").innerText=keybinds.menu.toUpperCase();
+
+}
+
+function update(){
+
+if(keys["ArrowLeft"]) player.x-=player.speed;
+if(keys["ArrowRight"]) player.x+=player.speed;
+if(keys["ArrowUp"]) player.y-=player.speed;
+if(keys["ArrowDown"]) player.y+=player.speed;
+
+if(
+player.x < pokopia.x + pokopia.size &&
+player.x + player.size > pokopia.x &&
+player.y < pokopia.y + pokopia.size &&
+player.y + player.size > pokopia.y
+){
+pokopia.caught=true;
+}
+
+}
+
+function draw(){
+
+ctx.clearRect(0,0,800,600);
+
+if(player.form==="ditto"){
+ctx.drawImage(dittoSprite,player.x,player.y,player.size,player.size);
+}else{
+ctx.drawImage(humanSprite,player.x,player.y,player.size,player.size);
+}
+
+if(!pokopia.caught){
+ctx.fillStyle="red";
+ctx.fillRect(pokopia.x,pokopia.y,pokopia.size,pokopia.size);
+}else{
+ctx.fillStyle="black";
+ctx.font="30px Arial";
+ctx.fillText("Pokopia Caught!",300,50);
+}
+
+}
+
+function gameLoop(){
+update();
+draw();
+requestAnimationFrame(gameLoop);
+}
+
+updateMenuText();
+gameLoop();
+
+</script>
+
+</body>
+</html>
