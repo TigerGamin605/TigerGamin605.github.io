@@ -1,197 +1,176 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Pokopia 2D</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pokopia v1.5</title>
 <style>
-body{
-background:#222;
-color:white;
-font-family:Arial;
-text-align:center;
-}
-
-canvas{
-background:lightgreen;
-display:block;
-margin:auto;
-border:3px solid black;
-}
-
-#menu{
-position:absolute;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-background:#333;
-padding:20px;
-border-radius:10px;
-display:none;
-}
+body { margin:0; font-family:sans-serif; display:flex; }
+#sidebar { width:200px; background:#222; color:white; padding:10px; overflow:auto; }
+canvas { flex:1; background:green; touch-action:none; }
+button { width:100%; margin-top:10px; }
 </style>
 </head>
-
 <body>
 
-<h2>Pokopia Demo</h2>
-
-<canvas id="game" width="800" height="600"></canvas>
-
-<div id="menu">
-<h3>Keybind Menu</h3>
-
-<p>Switch Character: <span id="switchKey">E</span></p>
-<button onclick="changeKey('switch')">Change</button>
-
-<p>Open Menu: <span id="menuKey">K</span></p>
-<button onclick="changeKey('menu')">Change</button>
-
-<br><br>
-<button onclick="toggleMenu()">Close</button>
+<div id="sidebar">
+<h3>Pokédex</h3>
+<ul id="dex"></ul>
+<button onclick="buildMode=true">Build Habitat</button>
+<p>Materials: <span id="mat">0</span></p>
 </div>
 
-<script>
+<canvas id="game"></canvas>
 
+<script>
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
-let player={
-x:400,
-y:300,
-size:64,
-speed:5,
-form:"ditto"
-};
-
-let pokopia={
-x:Math.random()*750,
-y:Math.random()*550,
-size:30,
-caught:false
-};
-
-let keys={};
-
-let keybinds={
-switch:"e",
-menu:"k"
-};
-
-let waitingForKey=null;
-
-/* SPRITES */
-
-const dittoSprite=new Image();
-dittoSprite.src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/132.png";
-
-const humanSprite=new Image();
-humanSprite.src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png"; 
-// using Pikachu sprite as placeholder trainer
-
-document.addEventListener("keydown",e=>{
-
-keys[e.key]=true;
-
-if(waitingForKey){
-keybinds[waitingForKey]=e.key;
-updateMenuText();
-waitingForKey=null;
-return;
+function resize(){
+  canvas.width = window.innerWidth - 200;
+  canvas.height = window.innerHeight;
 }
+window.addEventListener("resize", resize);
+resize();
 
-if(e.key===keybinds.switch){
-toggleForm();
-}
+// PLAYER (Ditto)
+let dittoImg = new Image();
+dittoImg.src = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/132.png";
 
-if(e.key===keybinds.menu){
-toggleMenu();
-}
+let player = {x:100,y:100,targetX:100,targetY:100};
 
+// GAME DATA
+let materials = 0;
+let resources = [];
+let habitats = [];
+let dex = new Set();
+let buildMode = false;
+
+const pokemonList = [
+  "pikachu","bulbasaur","charmander","squirtle",
+  "eevee","pidgey","rattata","zubat","oddish","meowth"
+];
+
+// 🔥 LOAD REAL SPRITES
+const pokemonSprites = {};
+pokemonList.forEach(name => {
+  let img = new Image();
+  img.src = `https://img.pokemondb.net/sprites/black-white/normal/${name}.png`;
+  pokemonSprites[name] = img;
 });
 
-document.addEventListener("keyup",e=>{
-keys[e.key]=false;
+// SPAWN RESOURCES
+function spawnResource(){
+  resources.push({
+    x:Math.random()*canvas.width,
+    y:Math.random()*canvas.height,
+    emoji:"🍎"
+  });
+}
+setInterval(spawnResource, 2000);
+
+// INPUT
+canvas.addEventListener("click", e=>{
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  if(buildMode && materials>=5){
+    habitats.push({
+      x,y,
+      pokemon: pokemonList[Math.floor(Math.random()*pokemonList.length)],
+      mobs:[]
+    });
+    materials -=5;
+    buildMode=false;
+    alert("New Habitat Built!");
+  } else {
+    player.targetX = x;
+    player.targetY = y;
+  }
 });
 
-function toggleForm(){
-
-if(player.form==="ditto"){
-player.form="human";
-}else{
-player.form="ditto";
-}
-
-}
-
-function toggleMenu(){
-
-let menu=document.getElementById("menu");
-
-menu.style.display = menu.style.display==="none" ? "block" : "none";
-
-}
-
-function changeKey(action){
-waitingForKey=action;
-alert("Press a key");
-}
-
-function updateMenuText(){
-
-document.getElementById("switchKey").innerText=keybinds.switch.toUpperCase();
-document.getElementById("menuKey").innerText=keybinds.menu.toUpperCase();
-
-}
-
+// UPDATE
 function update(){
+  let dx = player.targetX - player.x;
+  let dy = player.targetY - player.y;
+  player.x += dx*0.05;
+  player.y += dy*0.05;
 
-if(keys["ArrowLeft"]) player.x-=player.speed;
-if(keys["ArrowRight"]) player.x+=player.speed;
-if(keys["ArrowUp"]) player.y-=player.speed;
-if(keys["ArrowDown"]) player.y+=player.speed;
+  // collect resources
+  resources.forEach((r,i)=>{
+    if(Math.hypot(player.x-r.x, player.y-r.y)<20){
+      materials++;
+      resources.splice(i,1);
+    }
+  });
 
-if(
-player.x < pokopia.x + pokopia.size &&
-player.x + player.size > pokopia.x &&
-player.y < pokopia.y + pokopia.size &&
-player.y + player.size > pokopia.y
-){
-pokopia.caught=true;
+  // habitats
+  habitats.forEach(h=>{
+    if(h.mobs.length<3){
+      h.mobs.push({
+        x:h.x+Math.random()*30,
+        y:h.y+Math.random()*30
+      });
+    }
+
+    h.mobs.forEach(m=>{
+      m.x += (Math.random()-0.5)*2;
+      m.y += (Math.random()-0.5)*2;
+    });
+
+    dex.add(h.pokemon);
+  });
+
+  document.getElementById("mat").innerText = materials;
+
+  let dexList = document.getElementById("dex");
+  dexList.innerHTML="";
+  dex.forEach(p=>{
+    let li=document.createElement("li");
+    li.textContent=p;
+    dexList.appendChild(li);
+  });
 }
 
-}
-
+// DRAW
 function draw(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
 
-ctx.clearRect(0,0,800,600);
+  // resources
+  ctx.font="20px serif";
+  resources.forEach(r=> ctx.fillText(r.emoji,r.x,r.y));
 
-if(player.form==="ditto"){
-ctx.drawImage(dittoSprite,player.x,player.y,player.size,player.size);
-}else{
-ctx.drawImage(humanSprite,player.x,player.y,player.size,player.size);
+  // habitats
+  habitats.forEach(h=>{
+    // base
+    ctx.fillStyle="blue";
+    ctx.fillRect(h.x,h.y,40,40);
+
+    // big pokemon sprite
+    let sprite = pokemonSprites[h.pokemon];
+    if(sprite){
+      ctx.drawImage(sprite, h.x, h.y-40, 40, 40);
+    }
+
+    // mobs (small pokemon)
+    h.mobs.forEach(m=>{
+      if(sprite){
+        ctx.drawImage(sprite, m.x, m.y, 20, 20);
+      }
+    });
+  });
+
+  // player (Ditto)
+  ctx.drawImage(dittoImg, player.x-16, player.y-16, 32,32);
 }
 
-if(!pokopia.caught){
-ctx.fillStyle="red";
-ctx.fillRect(pokopia.x,pokopia.y,pokopia.size,pokopia.size);
-}else{
-ctx.fillStyle="black";
-ctx.font="30px Arial";
-ctx.fillText("Pokopia Caught!",300,50);
+// LOOP
+function loop(){
+  update();
+  draw();
+  requestAnimationFrame(loop);
 }
-
-}
-
-function gameLoop(){
-update();
-draw();
-requestAnimationFrame(gameLoop);
-}
-
-updateMenuText();
-gameLoop();
-
+loop();
 </script>
-
 </body>
 </html>

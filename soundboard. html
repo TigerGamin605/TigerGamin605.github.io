@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meme Soundboard</title>
+<style>
+body { font-family:sans-serif; text-align:center; background:#111; color:white; }
+h1 { margin-top:20px; }
+.grid {
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px,1fr));
+  gap:10px;
+  padding:20px;
+}
+button {
+  padding:20px;
+  font-size:14px;
+  border:none;
+  border-radius:10px;
+  background:#333;
+  color:white;
+  cursor:pointer;
+}
+button:hover { background:#555; }
+</style>
+</head>
+<body>
+
+<h1>😂 Meme Soundboard</h1>
+
+<div class="grid">
+  <button onclick="playSound('bruh')">BRUH</button>
+  <button onclick="playSound('vineboom')">Vine Boom</button>
+  <button onclick="playSound('wow')">WOW</button>
+  <button onclick="playSound('sad')">Sad Violin</button>
+  <button onclick="playSound('airhorn')">Airhorn</button>
+  <button onclick="playSound('fail')">Fail</button>
+</div>
+
+<audio id="bruh" src="https://www.myinstants.com/media/sounds/movie_1.mp3"></audio>
+<audio id="vineboom" src="https://www.myinstants.com/media/sounds/vine-boom.mp3"></audio>
+<audio id="wow" src="https://www.myinstants.com/media/sounds/wow.mp3"></audio>
+<audio id="sad" src="https://www.myinstants.com/media/sounds/sad-violin.mp3"></audio>
+<audio id="airhorn" src="https://www.myinstants.com/media/sounds/air-horn.mp3"></audio>
+<audio id="fail" src="https://www.myinstants.com/media/sounds/fail-trombone-01.mp3"></audio>
+
+<script>
+function playSound(id){
+  const sound = document.getElementById(id);
+  sound.currentTime = 0;
+  sound.play();
+}
+</script>
+
+</body>
+</html>
